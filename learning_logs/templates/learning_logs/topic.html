@@ -1,0 +1,17 @@
+{% extends "learning_logs/base.html" %}
+
+{% block content %}
+    <p>Topic: {{topic}}</p>
+
+    <p>Entries:</p>
+    <ul>
+        {% for entry in entries %}
+            <li>
+                <p>{{ entry.date_added|date:'M d, Y H:i' }}</p> {# '|' фильтр применяющий дальше формат даты. !Регистр имеет значение #}
+                <p>{{ entry.text|linebreaks }}</p> {# linebreaks следит чтобы все разрывы текста присутствовали на самом деле #}
+            </li>
+        {% empty %}
+            <li>There are mo entries for this topic yet.</li>
+        {% endfor %}
+    </ul>
+{% endblock content %}
