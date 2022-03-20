@@ -55,6 +55,9 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+
+    # Мои Middleware
+    'users.middleware.hide_django_admin_middleware',
 ]
 
 ROOT_URLCONF = 'learning_log.urls'
