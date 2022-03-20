@@ -75,8 +75,8 @@ def new_entry(request, topic_id):
 @login_required()
 def edit_entry(request, entry_id):
     """Редактирует существующую запись"""
-    entry = Entry.objects.get(id=entry_id)
-    topic = get_object_or_404(entry.topic)
+    entry = get_object_or_404(Entry, id=entry_id)
+    topic = entry.topic
     _check_topic_owner(request, topic)
 
     if request.method != 'POST':
