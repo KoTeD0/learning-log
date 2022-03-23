@@ -3,6 +3,7 @@ from django.contrib.auth.decorators import login_required
 from django.http import Http404
 from .models import Topic, Entry
 from .forms import TopicForm, EntryForm
+from django.db.models import Q
 
 
 def index(request):
@@ -13,7 +14,8 @@ def index(request):
 @login_required()
 def topics(request):
     """Выводит список тем"""
-    topics = Topic.objects.filter(owner=request.user).order_by('date_added')
+    topics = Topic.objects.filter(
+        Q(owner=request.user) | Q(public=True)).order_by('date_added')
     context = {'topics': topics}
     return render(request, 'learning_logs/topics.html', context)
 
@@ -93,6 +95,17 @@ def edit_entry(request, entry_id):
     return render(request, 'learning_logs/edit_entry.html', context)
 
 
+@login_required()
+def change_public(request, topic_id):
+    """Изменяет публичность топика и его записей"""
+    topic = get_object_or_404(Topic, id=topic_id)
+    topic.public = not topic.public
+    topic.save()
+    return redirect('learning_logs:topic', topic_id=topic.id)
+
+
 def _check_topic_owner(request, topic):
-    if topic.owner != request.user:
+    if not topic.public and topic.owner != request.user:
         raise Http404
+
+
