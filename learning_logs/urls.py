@@ -20,4 +20,8 @@ urlpatterns = [
     path('edit_entry/<int:entry_id>/', views.edit_entry, name='edit_entry'),
     # Изменение публичности топика
     path('change_public/<int:topic_id>', views.change_public, name='change_public'),
+    # Удаление записи из топика
+    path('delete_entry/<int:entry_id>/', views.delete_entry, name='delete_entry'),
+    # Удаление темы
+    path('delete_topic/<int:topic_id>/', views.delete_topic, name='delete_topic'),
 ]

@@ -104,6 +104,20 @@ def change_public(request, topic_id):
     return redirect('learning_logs:topic', topic_id=topic.id)
 
 
+@login_required()
+def delete_entry(request, entry_id):
+    entry = get_object_or_404(Entry, id=entry_id)
+    entry.delete()
+    return redirect('learning_logs:topic', topic_id=entry.topic.id)
+
+
+@login_required()
+def delete_topic(request, topic_id):
+    topic = get_object_or_404(Topic, id=topic_id)
+    topic.delete()
+    return redirect('learning_logs:topics')
+
+
 def _check_topic_owner(request, topic):
     if not topic.public and topic.owner != request.user:
         raise Http404
