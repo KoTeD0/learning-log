@@ -11,16 +11,19 @@ def index(request):
     return render(request, 'learning_logs/index.html')
 
 
-@login_required()
 def topics(request):
     """Выводит список тем"""
-    topics = Topic.objects.filter(
-        Q(owner=request.user) | Q(public=True)).order_by('date_added')
-    context = {'topics': topics}
+    try:  # Если пользователь зарегистрирован
+        topics = Topic.objects.filter(
+            Q(owner=request.user) | Q(public=True)).order_by('date_added')
+    except TypeError as e: # Если пользователь анонимный
+        topics = Topic.objects.filter(
+            public=True).order_by('date_added')
+    finally:
+        context = {'topics': topics}
     return render(request, 'learning_logs/topics.html', context)
 
 
-@login_required()
 def topic(request, topic_id):
     """Выводит одну тему и все её записи"""
     topic = get_object_or_404(Topic, id=topic_id)
@@ -99,6 +102,7 @@ def edit_entry(request, entry_id):
 def change_public(request, topic_id):
     """Изменяет публичность топика и его записей"""
     topic = get_object_or_404(Topic, id=topic_id)
+    _check_topic_owner(request, topic)
     topic.public = not topic.public
     topic.save()
     return redirect('learning_logs:topic', topic_id=topic.id)
@@ -107,6 +111,7 @@ def change_public(request, topic_id):
 @login_required()
 def delete_entry(request, entry_id):
     entry = get_object_or_404(Entry, id=entry_id)
+    _check_topic_owner(request, entry.topic)
     entry.delete()
     return redirect('learning_logs:topic', topic_id=entry.topic.id)
 
@@ -114,6 +119,7 @@ def delete_entry(request, entry_id):
 @login_required()
 def delete_topic(request, topic_id):
     topic = get_object_or_404(Topic, id=topic_id)
+    _check_topic_owner(request, topic)
     topic.delete()
     return redirect('learning_logs:topics')
 
@@ -121,5 +127,3 @@ def delete_topic(request, topic_id):
 def _check_topic_owner(request, topic):
     if not topic.public and topic.owner != request.user:
         raise Http404
-
-
